@@ -1,0 +1,901 @@
+--
+-- run below commmand from command prompt
+-- sqlcmd -S LAPTOP-9P65JTOC -E
+--
+
+select @@Version
+go
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Microsoft SQL Server 2019 (RTM) - 15.0.2000.5 (X64)
+        Sep 24 2019 13:48:23
+        Copyright (C) 2019 Microsoft Corporation
+        Enterprise Evaluation Edition (64-bit) on Windows 10 Pro 10.0 <X64> (Build 19044: ) (Hypervisor)
+
+
+(1 rows affected)
+1> use police_db
+2> go
+Msg 911, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Database 'police_db' does not exist. Make sure that the name is entered correctly.
+1> use policedb
+2> go
+Changed database context to 'policedb'.
+1> select * from Incident
+2> go
+Incident_ID Incident_Date    Incident_Time CitationType_ID
+----------- ---------------- ------------- ---------------
+
+(0 rows affected)
+1>
+2> select * from Incident
+3> go
+Msg 208, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 2
+Invalid object name 'Incident'.
+1> create schema test
+2> go
+1> create table Incident (
+2>      Incident_ID int primary key identity not null.
+3>      Incident)
+4> reset
+1> create table Incident (
+2>       Incident_ID int primary key identity not null,
+3>       Incident_Date date not null,
+4>      Incident_Time char(4) not null,
+5>      CitationType_ID int not null,
+6>      foreign key (CitationType_ID) references CitationType_LKP(CitationType_ID)
+7> )
+8> go
+Msg 1767, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Foreign key 'FK__Incident__Citati__300424B4' references invalid table 'CitationType_LKP'.
+Msg 1750, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Could not create constraint or index. See previous errors.
+1> create table CitationType_LKP (
+2>      CitationType_ID int primary key identity,
+3>      CitataionType_Desc varchar(50) not null
+4> )
+5> go
+1> create table Incident (
+2>       Incident_ID int primary key identity not null,
+3>       Incident_Date date not null,
+4>      Incident_Time char(4) not null,
+5>      CitationType_ID int not null,
+6>      foreign key (CitationType_ID) references CitationType_LKP(CitationType_ID)
+7> )
+8> go
+1> create table Violation (
+2>      Violation_ID int primary key identity,
+3>      Violation_Desc varchar(50) not null
+4> )
+5> go
+1> create table IncidentViolation_XREF (
+2>      XREF_ID int identity primary key,
+3>      Incident_ID int not null
+4>      ,
+5>      Violation_ID int not null,
+6>      foreign key (Incident_ID) references Incident(IncidentID),
+7>      foriegn key (Violation_ID)) references Violation(Violation_ID)
+8> )
+9> go
+Msg 156, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 7
+Incorrect syntax near the keyword 'key'.
+1> create table IncidentViolation_XREF (
+2>      XREF_ID int identity primary key,
+3>      Incident_ID int not null
+4>      ,
+5>      Violation_ID int not null,
+6>      foreign key (Incident_ID) references Incident(IncidentID),
+7>      foriegn key (Violation_ID) references Violation(Violation_ID)
+8> )
+9> go
+Msg 156, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 7
+Incorrect syntax near the keyword 'key'.
+1> create table IncidentViolation_XREF (
+2>      XREF_ID int primary key identity,
+3>      Incident_ID int not null,
+4>      foreign key (Incident_ID) references Incident(IncidentID),
+5>      foreign key (Violation_ID) references Violation(Violation_ID)
+6> )
+7> go
+Msg 1769, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Foreign key 'Violation_ID' references invalid column 'Violation_ID' in referencing table 'IncidentViolation_XREF'.
+Msg 1750, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Could not create constraint or index. See previous errors.
+1> select * from Violation
+2> fo
+3> go
+Violation_ID Violation_Desc
+------------ --------------------------------------------------
+
+(0 rows affected)
+1> create table IncidentViolation_XREF (
+2>      XREF_ID int primary key identity,
+3>      Incident_ID int not null,
+4>      Violation_ID int not null,
+5>      foreign key (Incident_ID) references Incident(IncidentID),
+6>      foreign key (Violation_ID) references Violation(Violation_ID)
+7> )
+8> go
+Msg 1770, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Foreign key 'FK__IncidentV__Incid__398D8EEE' references invalid column 'IncidentID' in referenced table 'Incident'.
+Msg 1750, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Could not create constraint or index. See previous errors.
+1> create table IncidentViolation_XREF (
+2>      XREF_ID int primary key identity,
+3>      Incident_ID int not null,
+4>      foreign key (Incident_ID) references Incident(IncidentID),
+5>      foreign key (Incident_ID) references Incident(IncidentID),
+6> reset
+1> create table IncidentViolation_XREF (
+2>      XREF_ID int primary key identity,
+3>      Incident_ID int not null,
+4>      Violation_ID int not null,
+5>      foreign key (Incident_ID) references Incident(Incident_ID),
+6>      foreign key (Violation_ID) references Violation(Violation_ID)
+7> )
+8> go
+1> insert into Violation ("THEFT");
+2> go
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near ';'.
+1> insert into Violation ("THEFT")
+2> go
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near ')'.
+1> insert into Violation ("","THEFT");
+2> go
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near ';'.
+1> insert into Violation output Violation_ID values ("THEFT");
+2> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'Violation_ID'.
+1> insert into Violation(violation) output Violation_ID values ("THEFT");
+2> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'violation'.
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'Violation_ID'.
+1> insert into Violation(Violation_Desc) output Violation_ID values ("THEFT");
+2> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'Violation_ID'.
+1> select * from Violation
+2> go
+Violation_ID Violation_Desc
+------------ --------------------------------------------------
+
+(0 rows affected)
+1> insert into Violation(Violation_Desc) output inserted.Violation_ID values ("THEFT");
+2> go
+Violation_ID
+------------
+           1
+
+(1 rows affected)
+1> select * from Violation
+2> go
+Violation_ID Violation_Desc
+------------ --------------------------------------------------
+           1 THEFT
+
+(1 rows affected)
+1> warning := select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT"
+2> go
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near ':'.
+1> warning = select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT"
+2> go
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near '='.
+1> go
+1> set warning = select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT"
+2> go
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near '='.
+1> set @warning = select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT";
+2> go
+Msg 156, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near the keyword 'select'.
+1> set @warning = select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT";
+2>
+3> go
+Msg 156, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near the keyword 'select'.
+1> declare @warning as varchar(50);
+2> go
+1> set @warning = select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT";
+2> go
+Msg 156, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near the keyword 'select'.
+1> select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT" into @warning;
+2> go
+Msg 156, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near the keyword 'into'.
+1> set @warning = (select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT");
+2> go
+Msg 137, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Must declare the scalar variable "@warning".
+1> declare @warning as varchar(50);
+2> set @warning = (select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT");
+3> go
+Msg 208, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 2
+Invalid object name 'Citation_LKP'.
+1> declare @warning as varchar(50);
+2> set @warning = (select CitationType_ID from CitationType_LKP where CitationType_DESC = "THEFT");
+3> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 2
+Invalid column name 'CitationType_DESC'.
+1> declare @warning as varchar(50);
+2> set @warning = (select CitationType_ID from Citation_LKP where CitationType_DESC = "THEFT");
+3> reset
+1> declare @warning as varchar(50);
+2> set @warning = (select CitationType_ID from Citation_LKP where CitationType_Desc = "THEFT");
+3> go
+Msg 208, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 2
+Invalid object name 'Citation_LKP'.
+1> declare @warning as varchar(50);
+2> set @warning = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "THEFT");
+3> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 2
+Invalid column name 'CitationType_Desc'.
+1> select * from CitationType_LKP
+2> go
+CitationType_ID CitataionType_Desc
+--------------- --------------------------------------------------
+
+(0 rows affected)
+1> drop table CitationType_LKP if exists;
+2> go
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Incorrect syntax near ';'.
+1> drop table if exists CititationType_LKP;
+2> go
+1> create table CitationType_LKP (
+2>      CitationType_ID int primary key identity,
+3>      CitationType_Desc varchar(50) not null
+4> );
+5> go
+Msg 2714, Level 16, State 6, Server LAPTOP-9P65JTOC, Line 1
+There is already an object named 'CitationType_LKP' in the database.
+1> select * from CitationType_LKP
+2> go
+CitationType_ID CitataionType_Desc
+--------------- --------------------------------------------------
+
+(0 rows affected)
+1> drop table if exists CitationType_LKP;
+2> go
+Msg 3726, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Could not drop object 'CitationType_LKP' because it is referenced by a FOREIGN KEY constraint.
+1> alter tablename CitationType_LKP
+2> drop column CitataionType_DESC
+3> go
+Msg 343, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 1
+Unknown object type 'tablename' used in a CREATE, DROP, or ALTER statement.
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 2
+Incorrect syntax near 'CitataionType_DESC'.
+1> alter table CitationType_LKP
+2> drop column CitataionType_DESC
+3> go
+1> alter table CitationType_LKP
+2> add column CitationType_Desc varchar(50) not null
+3> go
+Msg 156, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 2
+Incorrect syntax near the keyword 'column'.
+1> alter table CitationType_LKP
+2> add CitationType_Desc varchar(50) not null
+3> go
+1> declare @warning as varchar(50);
+2> set @warning = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "THEFT");
+3> go
+1> @@warning
+2> go
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 1
+Must declare the scalar variable "@@warning".
+1> declare @warning as varchar(50);
+2> set @warning = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "THEFT");
+3> @@warning
+4> go
+Msg 102, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 3
+Incorrect syntax near '@@warning'.
+1> print @warning
+2> go
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 1
+Must declare the scalar variable "@warning".
+1> declare @warning as varchar(50);
+2> set @warning = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "THEFT");
+3> print @warning
+4> go
+
+1> insert into Violation(Violation_Desc) output inserted.Violation_ID values ("TRESPASS");
+2> insert into Violation(Violation_Desc) output inserted.Violation_ID values ("BURGLARY");
+3> insert into Violation(Violation_Desc) output inserted.Violation_ID values ("SPEEDING");
+4> insert into Violation(Violation_Desc) output inserted.Violation_ID values ("FAILURE TO OBEY TRAFFIC LAWS");
+5> insert into Violation(Violation_Desc) output inserted.Violation_ID values ("UNLAWFUL ACTIVITIES");
+6> insert into Violation(Violation_Desc) output inserted.Violation_ID values ("EXPIRED REGISTRATION");
+7> go
+Violation_ID
+------------
+           2
+
+(1 rows affected)
+Violation_ID
+------------
+           3
+
+(1 rows affected)
+Violation_ID
+------------
+           4
+
+(1 rows affected)
+Violation_ID
+------------
+           5
+
+(1 rows affected)
+Violation_ID
+------------
+           6
+
+(1 rows affected)
+Violation_ID
+------------
+           7
+
+(1 rows affected)
+1> select * from Violation
+2> go
+Violation_ID Violation_Desc
+------------ --------------------------------------------------
+           1 THEFT
+           2 TRESPASS
+           3 BURGLARY
+           4 SPEEDING
+           5 FAILURE TO OBEY TRAFFIC LAWS
+           6 UNLAWFUL ACTIVITIES
+           7 EXPIRED REGISTRATION
+
+(7 rows affected)
+1> insert into CitationType_LKP(CitataionType_Desc) output inserted.CitationType_ID values ("Warning");
+2> insert into CitationType_LKP(CitataionType_Desc) output inserted.CitationType_ID values ("Citation");
+3> insert into CitationType_LKP(CitataionType_Desc) output inserted.CitationType_ID values ("Criminal Charge");
+4> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'CitataionType_Desc'.
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 2
+Invalid column name 'CitataionType_Desc'.
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 3
+Invalid column name 'CitataionType_Desc'.
+1> select * from CitationType_LKP
+2> go
+CitationType_ID CitationType_Desc
+--------------- --------------------------------------------------
+
+(0 rows affected)
+1> insert into CitationType_LKP(CitationType_Desc) output inserted.CitationType_ID values ("Warning");
+2> insert into CitationType_LKP(CitationType_Desc) output inserted.CitationType_ID values ("Citation");
+3> insert into CitationType_LKP(CitationType_Desc) output inserted.CitationType_ID values ("Criminal Charge");
+4> go
+CitationType_ID
+---------------
+              1
+
+(1 rows affected)
+CitationType_ID
+---------------
+              2
+
+(1 rows affected)
+CitationType_ID
+---------------
+              3
+
+(1 rows affected)
+1> select * from CitationType_LKP
+2> go
+CitationType_ID CitationType_Desc
+--------------- --------------------------------------------------
+              1 Warning
+              2 Citation
+              3 Criminal Charge
+
+(3 rows affected)
+1>
+2>
+3>
+4>
+5> reset
+1> select * from Incident
+2> go
+Incident_ID Incident_Date    Incident_Time CitationType_ID
+----------- ---------------- ------------- ---------------
+
+(0 rows affected)
+1> select * from IncidentViolation_XREF
+2> go
+XREF_ID     Incident_ID Violation_ID
+----------- ----------- ------------
+
+(0 rows affected)
+1> select * from CitationType_LKP
+2> go
+CitationType_ID CitationType_Desc
+--------------- --------------------------------------------------
+              1 Warning
+              2 Citation
+              3 Criminal Charge
+
+(3 rows affected)
+1> select * from Violation
+2> go
+Violation_ID Violation_Desc
+------------ --------------------------------------------------
+           1 THEFT
+           2 TRESPASS
+           3 BURGLARY
+           4 SPEEDING
+           5 FAILURE TO OBEY TRAFFIC LAWS
+           6 UNLAWFUL ACTIVITIES
+           7 EXPIRED REGISTRATION
+
+(7 rows affected)
+1> select * from Violation where Violation_Desc LIKE '%LAWS'
+2> go
+Violation_ID Violation_Desc
+------------ --------------------------------------------------
+           5 FAILURE TO OBEY TRAFFIC LAWS
+
+(1 rows affected)
+1> update Violation set Violation_Desc = "FAILURE TO OBEY TRAFFIC SIGNAL" where Violation_desc = "FAILURE TO OBEY TR
+2~ AFFIC LAWS"
+3> go
+
+(0 rows affected)
+1> select * from Violation where Violation_Desc LIKE '%LAWS'
+2> go
+Violation_ID Violation_Desc
+------------ --------------------------------------------------
+           5 FAILURE TO OBEY TRAFFIC LAWS
+
+(1 rows affected)
+1> update Violation set Violation_Desc = "FAILURE TO OBEY TRAFFIC SIGNAL" where Violation_desc = "FAILURE TO OBEY TR
+2~ AFFIC LAWS
+3~ reset
+4~ reset
+5~ go
+6~
+7~ reset
+8~ "
+9> reset
+1> update Violation set Violation_Desc = "FAILURE TO OBEY TRAFFIC SIGNAL"
+2> where  Violation_Desc LIKE '%LAWS'
+3> go
+
+(1 rows affected)
+1> select * from Violation
+2> go
+Violation_ID Violation_Desc
+------------ --------------------------------------------------
+           1 THEFT
+           2 TRESPASS
+           3 BURGLARY
+           4 SPEEDING
+           5 FAILURE TO OBEY TRAFFIC SIGNAL
+           6 UNLAWFUL ACTIVITIES
+           7 EXPIRED REGISTRATION
+
+(7 rows affected)
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (2020-12-20,1429,1)
+2> go
+Msg 206, Level 16, State 2, Server LAPTOP-9P65JTOC, Line 1
+Operand type clash: int is incompatible with date
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ('2020-12-20',1429,1)
+2> go
+Incident_ID
+-----------
+          1
+
+(1 rows affected)
+1> select * from Incident
+2> go
+Incident_ID Incident_Date    Incident_Time CitationType_ID
+----------- ---------------- ------------- ---------------
+          1       2020-12-20 1429                        1
+
+(1 rows affected)
+1> select Violation\Incident_Desc, CitationType_Desc from Incident
+2> reset
+1> select Violation_Desc, CitationType_Desc, Incident_Date, Incident_Time from Incident
+2> INNER JOIN CitationType_LKP on CitationType_ID
+3> go
+Msg 4145, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 2
+An expression of non-boolean type specified in a context where a condition is expected, near 'CitationType_ID'.
+1> select CitationType_Desc, Incident_Date, Incident_Time from Incident
+2> INNER JOIN CitationType_LKP on CitationType_ID
+3> go
+Msg 4145, Level 15, State 1, Server LAPTOP-9P65JTOC, Line 2
+An expression of non-boolean type specified in a context where a condition is expected, near 'CitationType_ID'.
+1> select Violation_Desc, CitationType_Desc, Incident_Date, Incident_Time from Incident
+2> INNER JOIN CitationType_LKP lkp on CitationType_ID = lkp.CitationType_ID
+3> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'Violation_Desc'.
+Msg 209, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 2
+Ambiguous column name 'CitationType_ID'.
+1> select CitationType_Desc, Incident_Date, Incident_Time from Incident
+2> INNER JOIN CitationType_LKP lkp on CitationType_ID = lkp.CitationType_ID
+3> go
+Msg 209, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 2
+Ambiguous column name 'CitationType_ID'.
+1> select Violation_Desc, i.CitationType_Desc, Incident_Date, Incident_Time from Incident i
+2> INNER JOIN CitationType_LKP lkp on i.CitationType_ID = lkp.CitationType_ID
+3> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'Violation_Desc'.
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'CitationType_Desc'.
+1> select i.CitationType_Desc, Incident_Date, Incident_Time from Incident i
+2> INNER JOIN CitationType_LKP lkp on i.CitationType_ID = lkp.CitationType_ID
+3> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'CitationType_Desc'.
+1> select CitationType_Desc, Incident_Date, Incident_Time from Incident i
+2> INNER JOIN CitationType_LKP lkp on i.CitationType_ID = lkp.CitationType_ID
+3> go
+CitationType_Desc                                  Incident_Date    Incident_Time
+-------------------------------------------------- ---------------- -------------
+Warning                                                  2020-12-20 1429
+
+(1 rows affected)
+1> select Violation_Desc, i.CitationType_Desc, Incident_Date, Incident_Time from Incident i
+2> INNER JOIN CitationType_LKP lkp on i.CitationType_ID = lkp.CitationType_ID
+3> INNER JOIN IncidentViolation_XREF xref on i.Incident_ID = xref.Incident_ID
+4> INNER JOIN Violation v on xref.Violation_ID = v.Violation_ID
+5> go
+Msg 207, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid column name 'CitationType_Desc'.
+1> select v.Violation_Desc, lkp.CitationType_Desc, i.Incident_Date, i.Incident_Time from Incident i
+2> INNER JOIN CitationType_LKP lkp on i.CitationType_ID = lkp.CitationType_ID
+3> INNER JOIN IncidentViolation_XREF xref on i.Incident_ID = xref.Incident_ID
+4> INNER JOIN Violation v on xref.Violation_ID = v.Violation_ID
+5> go
+Violation_Desc                                     CitationType_Desc                                  Incident_Date    Incident_Time
+-------------------------------------------------- -------------------------------------------------- ---------------- -------------
+
+(0 rows affected)
+1> select xref.Violation_ID, lkp.CitationType_Desc, i.Incident_Date, i.Incident_Time from Incident i
+2> INNER JOIN CitationType_LKP lkp on i.CitationType_ID = lkp.CitationType_ID
+3> INNER JOIN IncidentViolation_XREF xref on i.Incident_ID = xref.Incident_ID
+4> go
+Violation_ID CitationType_Desc                                  Incident_Date    Incident_Time
+------------ -------------------------------------------------- ---------------- -------------
+
+(0 rows affected)
+1> select xref.Violation_ID, lkp.CitationType_Desc, i.Incident_Date, i.Incident_Time from Incident i
+2> INNER JOIN CitationType_LKP lkp on i.CitationType_ID = lkp.CitationType_ID
+3> INNER JOIN IncidentViolation_XREF xref on i.Incident_ID = xref.Incident_ID
+4> go
+Violation_ID CitationType_Desc                                  Incident_Date    Incident_Time
+------------ -------------------------------------------------- ---------------- -------------
+
+(0 rows affected)
+1> select * from IncidentViolation XREF
+2> go
+Msg 208, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 1
+Invalid object name 'IncidentViolation'.
+1> select * from IncidentViolation_XREF
+2> go
+XREF_ID     Incident_ID Violation_ID
+----------- ----------- ------------
+
+(0 rows affected)
+1> select * from Incident
+2> go
+Incident_ID Incident_Date    Incident_Time CitationType_ID
+----------- ---------------- ------------- ---------------
+          1       2020-12-20 1429                        1
+
+(1 rows affected)
+1> select * from Incident
+2>
+3> go
+Incident_ID Incident_Date    Incident_Time CitationType_ID
+----------- ---------------- ------------- ---------------
+          1       2020-12-20 1429                        1
+
+(1 rows affected)
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/20/2020,1429, @warning);
+2> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/24/2022,0934, @crimnal);
+3> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/9/2020,1615, @citation);
+4> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/9/2020,0756, @citation);
+5> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (5/19/2019,0351, @citation);
+6> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (10/12/2020,1247, @crimnal);
+7> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/28/2020,2208, @warning);
+8> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (5/9/2019,0613, @crimnal);
+9> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/8/2020,2154, @citation);
+10> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (10/30/2020,1716, @citation);
+11> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/18/2019,1811, @citation);
+12> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (5/13/2020,1923, @citation);
+13> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/20/2019,1431, @warning);
+14> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (4/8/2019,0806, @crimnal);
+15> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (9/5/2021,1938, @crimnal);
+16> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (9/5/2021,2305, @crimnal);
+17> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (5/7/2022,2226, @crimnal);
+18> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/25/2021,0950, @warning);
+19> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/3/2020,1024, @citation);
+20> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/31/2021,0245, @citation);
+21> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/8/2020,1005, @warning);
+22> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (4/14/2022,2307, @crimnal);
+23> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (8/25/2019,0239, @warning);
+24> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (10/31/2021,1325, @citation);
+25> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (5/20/2019,0951, @warning);
+26> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (1/2/2020,1950, @crimnal);
+27> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/24/2020,1928, @crimnal);
+28> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/9/2021,1003, @citation);
+29> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (5/4/2020,0121, @citation);
+30> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (5/20/2021,2053, @warning);
+31> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/27/2019,1028, @citation);
+32> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/5/2020,1633, @crimnal);
+33> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/6/2022,2003, @crimnal);
+34> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/28/2022,0512, @crimnal);
+35> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/31/2021,2219, @citation);
+36> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (4/17/2020,1844, @citation);
+37> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (8/10/2021,1321, @warning);
+38> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (9/12/2021,1729, @crimnal);
+39> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/22/2020,0349, @citation);
+40> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (10/7/2020,1610, @crimnal);
+41> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (10/1/2019,1203, @warning);
+42> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (2/11/2020,1010, @warning);
+43> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (7/22/2020,2142, @citation);
+44> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (2/26/2020,2257, @crimnal);
+45> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (7/24/2019,0844, @warning);
+46> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/13/2020,1901, @citation);
+47> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (2/18/2021,1409, @warning);
+48> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (9/11/2021,0249, @warning);
+49> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (2/20/2020,2028, @crimnal);
+50> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/12/2022,1040, @crimnal);
+51> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/22/2021,0051, @warning);
+52> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (1/2/2021,0448, @warning);
+53> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/2/2019,1827, @warning);
+54> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/17/2022,0849, @warning);
+55> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (10/22/2020,1029, @warning);
+56> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/30/2020,0452, @crimnal);
+57> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/1/2021,1921, @warning);
+58> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/28/2020,0507, @warning);
+59> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (1/25/2021,2023, @warning);
+60> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/2/2022,0845, @crimnal);
+61> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (10/19/2020,0331, @crimnal);
+62> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/22/2022,1104, @citation);
+63> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (7/25/2019,1823, @crimnal);
+64> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/2/2020,1027, @crimnal);
+65> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (1/14/2022,0909, @warning);
+66> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (12/11/2019,0455, @crimnal);
+67> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (4/17/2019,1635, @crimnal);
+68> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (1/18/2022,1834, @citation);
+69> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/3/2019,0303, @citation);
+70> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/24/2022,2246, @citation);
+71> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/25/2021,1255, @crimnal);
+72> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (8/17/2019,0558, @warning);
+73> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (8/24/2021,1543, @citation);
+74> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (8/17/2020,1015, @citation);
+75> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (7/14/2020,0030, @crimnal);
+76> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (3/18/2020,1430, @crimnal);
+77> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (7/16/2019,0311, @citation);
+78> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (10/16/2021,2026, @citation);
+79> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (8/26/2021,1551, @warning);
+80> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (11/24/2021,1202, @crimnal);
+81> reset
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/24/2022,0934, @crimnal);
+2> go
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 1
+Must declare the scalar variable "@crimnal".
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/24/2022,0934, 3);
+2> go
+Msg 206, Level 16, State 2, Server LAPTOP-9P65JTOC, Line 1
+Operand type clash: int is incompatible with date
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values (6/24/2022,'0934', 3);
+2> go
+Msg 206, Level 16, State 2, Server LAPTOP-9P65JTOC, Line 1
+Operand type clash: int is incompatible with date
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ('6/24/2022','0934', 3);
+2> go
+Incident_ID
+-----------
+          2
+
+(1 rows affected)
+1> select * from Incident
+2> go
+Incident_ID Incident_Date    Incident_Time CitationType_ID
+----------- ---------------- ------------- ---------------
+          1       2020-12-20 1429                        1
+          2       2022-06-24 0934                        3
+
+(2 rows affected)
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/9/2020 ', '1615 ', @citation);
+2>
+3> go
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 1
+Must declare the scalar variable "@citation".
+1> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/9/2020 ', '1615 ', @citation);
+2> reset
+1> declare @warning as varchar(50)
+2> declare @citation as varchar(50)
+3> declare @crime as varchar(50)
+4> set @warning = (select CitationType_ID from Citation_LKP where CitationType_Desc = "Warning");
+5> set @citation = (select CitationType_ID from Citation_LKP where CitationType_Desc = "Citation");
+6> set @crime = (select CitationType_ID from Citation_LKP where CitationType_Desc = "Criminal Charge");
+7> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/9/2020 ', '1615 ', @citation);
+8> go
+Msg 208, Level 16, State 1, Server LAPTOP-9P65JTOC, Line 4
+Invalid object name 'Citation_LKP'.
+1> declare @warning as varchar(50)
+2> declare @citation as varchar(50)
+3> declare @crime as varchar(50)
+4> set @warning = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "Warning");
+5> set @citation = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "Citation");
+6> set @crime = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "Criminal Charge");
+7> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/9/2020 ', '1615 ', @citation);
+8> go
+Incident_ID
+-----------
+          3
+
+(1 rows affected)
+1> declare @warning as varchar(50)
+2> declare @citation as varchar(50)
+3> declare @crime as varchar(50)
+4> set @warning = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "Warning");
+5> set @citation = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "Citation");
+6> set @crime = (select CitationType_ID from CitationType_LKP where CitationType_Desc = "Criminal Charge");
+7> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/9/2020 ', '0756 ', @citation);
+8> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '5/19/2019 ', '0351 ', @citation);
+9> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '10/12/2020 ', '1247 ', @crimnal);
+10> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '6/28/2020 ', '2208 ', @warning);
+11> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '5/9/2019 ', '0613 ', @crimnal);
+12> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/8/2020 ', '2154 ', @citation);
+13> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '10/30/2020 ', '1716 ', @citation);
+14> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/18/2019 ', '1811 ', @citation);
+15> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '5/13/2020 ', '1923 ', @citation);
+16> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/20/2019 ', '1431 ', @warning);
+17> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '4/8/2019 ', '0806 ', @crimnal);
+18> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '9/5/2021 ', '1938 ', @crimnal);
+19> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '9/5/2021 ', '2305 ', @crimnal);
+20> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '5/7/2022 ', '2226 ', @crimnal);
+21> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/25/2021 ', '0950 ', @warning);
+22> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/3/2020 ', '1024 ', @citation);
+23> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/31/2021 ', '0245 ', @citation);
+24> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '6/8/2020 ', '1005 ', @warning);
+25> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '4/14/2022 ', '2307 ', @crimnal);
+26> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '8/25/2019 ', '0239 ', @warning);
+27> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '10/31/2021 ', '1325 ', @citation);
+28> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '5/20/2019 ', '0951 ', @warning);
+29> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '1/2/2020 ', '1950 ', @crimnal);
+30> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '6/24/2020 ', '1928 ', @crimnal);
+31> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/9/2021 ', '1003 ', @citation);
+32> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '5/4/2020 ', '0121 ', @citation);
+33> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '5/20/2021 ', '2053 ', @warning);
+34> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/27/2019 ', '1028 ', @citation);
+35> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/5/2020 ', '1633 ', @crimnal);
+36> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/6/2022 ', '2003 ', @crimnal);
+37> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/28/2022 ', '0512 ', @crimnal);
+38> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/31/2021 ', '2219 ', @citation);
+39> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '4/17/2020 ', '1844 ', @citation);
+40> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '8/10/2021 ', '1321 ', @warning);
+41> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '9/12/2021 ', '1729 ', @crimnal);
+42> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/22/2020 ', '0349 ', @citation);
+43> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '10/7/2020 ', '1610 ', @crimnal);
+44> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '10/1/2019 ', '1203 ', @warning);
+45> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '2/11/2020 ', '1010 ', @warning);
+46> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '7/22/2020 ', '2142 ', @citation);
+47> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '2/26/2020 ', '2257 ', @crimnal);
+48> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '7/24/2019 ', '0844 ', @warning);
+49> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/13/2020 ', '1901 ', @citation);
+50> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '2/18/2021 ', '1409 ', @warning);
+51> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '9/11/2021 ', '0249 ', @warning);
+52> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '2/20/2020 ', '2028 ', @crimnal);
+53> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '6/12/2022 ', '1040 ', @crimnal);
+54> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/22/2021 ', '0051 ', @warning);
+55> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '1/2/2021 ', '0448 ', @warning);
+56> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/2/2019 ', '1827 ', @warning);
+57> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '6/17/2022 ', '0849 ', @warning);
+58> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '10/22/2020 ', '1029 ', @warning);
+59> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/30/2020 ', '0452 ', @crimnal);
+60> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/1/2021 ', '1921 ', @warning);
+61> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/28/2020 ', '0507 ', @warning);
+62> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '1/25/2021 ', '2023 ', @warning);
+63> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '6/2/2022 ', '0845 ', @crimnal);
+64> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '10/19/2020 ', '0331 ', @crimnal);
+65> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '6/22/2022 ', '1104 ', @citation);
+66> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '7/25/2019 ', '1823 ', @crimnal);
+67> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/2/2020 ', '1027 ', @crimnal);
+68> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '1/14/2022 ', '0909 ', @warning);
+69> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '12/11/2019 ', '0455 ', @crimnal);
+70> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '4/17/2019 ', '1635 ', @crimnal);
+71> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '1/18/2022 ', '1834 ', @citation);
+72> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/3/2019 ', '0303 ', @citation);
+73> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/24/2022 ', '2246 ', @citation);
+74> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '6/25/2021 ', '1255 ', @crimnal);
+75> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '8/17/2019 ', '0558 ', @warning);
+76> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '8/24/2021 ', '1543 ', @citation);
+77> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '8/17/2020 ', '1015 ', @citation);
+78> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '7/14/2020 ', '0030 ', @crimnal);
+79> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '3/18/2020 ', '1430 ', @crimnal);
+80> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '7/16/2019 ', '0311 ', @citation);
+81> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '10/16/2021 ', '2026 ', @citation);
+82> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '8/26/2021 ', '1551 ', @warning);
+83> insert into Incident(Incident_Date,Incident_Time,CitationType_ID) output inserted.Incident_ID values ( '11/24/2021 ', '1202 ', @crimnal);
+84> go
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 9
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 11
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 17
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 18
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 19
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 20
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 25
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 29
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 30
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 35
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 36
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 37
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 41
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 43
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 47
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 52
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 53
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 59
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 63
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 64
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 66
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 67
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 69
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 70
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 74
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 78
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 79
+Must declare the scalar variable "@crimnal".
+Msg 137, Level 15, State 2, Server LAPTOP-9P65JTOC, Line 83
+Must declare the scalar variable "@crimnal".
+1> reset
+1> select * from incident
+2> go
+Incident_ID Incident_Date    Incident_Time CitationType_ID
+----------- ---------------- ------------- ---------------
+          1       2020-12-20 1429                        1
+          2       2022-06-24 0934                        3
+          3       2020-12-09 1615                        2
+
+(3 rows affected)
+1> history
+2> go
+Msg 2812, Level 16, State 62, Server LAPTOP-9P65JTOC, Line 1
+Could not find stored procedure 'history'.
+1>
